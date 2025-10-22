@@ -25,7 +25,7 @@ struct TasksAppView: View {
                     }
                 }
             }
-            .navigationDestination(for: WatchTask.self) { task in
+            .navigationDestination(for: Task.self) { task in
                 TaskDetailView(task: task)
             }
         }

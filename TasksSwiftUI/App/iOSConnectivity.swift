@@ -7,6 +7,7 @@
 
 import Foundation
 import WatchConnectivity
+import TasksSwiftUIShared
 
 class iOSConnectivity: NSObject, WCSessionDelegate {
     static let shared = iOSConnectivity()
@@ -44,7 +45,7 @@ class iOSConnectivity: NSObject, WCSessionDelegate {
         let taskManager = TasksAppManager.shared
 
         if let watchTasks = applicationContext["tasks"] as? Data {
-            if let decodedTasks = try? JSONDecoder().decode([WatchTask].self, from: watchTasks) {
+            if let decodedTasks = try? JSONDecoder().decode([AppTask].self, from: watchTasks) {
                 taskManager.tasks = decodedTasks
                 taskManager.selectedTask = decodedTasks.first
             } else {
@@ -65,7 +66,7 @@ class iOSConnectivity: NSObject, WCSessionDelegate {
         }
     }
     
-    func sendUpdatedTasks(tasks: [WatchTask]) {
+    func sendUpdatedTasks(tasks: [AppTask]) {
         if let taskData = try? JSONEncoder().encode(tasks) {
             let tasksPayload: [String: Any] = ["tasks": taskData]
             setContext(to: tasksPayload)

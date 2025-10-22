@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import TasksSwiftUIShared
 
 struct Header: View {
     var taskCategory: TaskCategory

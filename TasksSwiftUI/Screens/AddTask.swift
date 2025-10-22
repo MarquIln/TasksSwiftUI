@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
+import TasksSwiftUIShared
 
 struct AddTask: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) var modelContext
     
-    var selectedTask: Task?
+    var selectedTask: AppTask?
 
     @State var name: String = ""
     @State var description: String = ""
@@ -151,14 +152,12 @@ struct AddTask: View {
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-
-                    // Split complex boolean logic into a tiny helper to help the type-checker
                     let isUnchanged: Bool = {
-                        guard isEditing, let existing = selectedTask else { return false }
-                        return selectedCategory == existing.category
-                            && name == existing.name
-                            && description == existing.details
-                            && isCompleted == existing.isCompleted
+                        guard isEditing, let existingTask = selectedTask else { return false }
+                        return selectedCategory == existingTask.category
+                            && name == existingTask.name
+                            && description == existingTask.details
+                            && isCompleted == existingTask.isCompleted
                     }()
 
                     Button(isEditing ? "Done" : "Add") {

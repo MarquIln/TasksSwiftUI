@@ -7,19 +7,20 @@
 
 import SwiftData
 import SwiftUI
+import TasksSwiftUIShared
 
 struct Tasks: View {
 
     @Environment(\.modelContext) var modelContext
 
-    @State var editTask: Task?
+    @State var editTask: AppTask?
     @State private var addTask: Bool = false
 
-    @Query var tasks: [Task]
+    @Query var tasks: [AppTask]
 
     let connectivity = iOSConnectivity()
 
-    var groupedTasks: [TaskCategory: [Task]] {
+    var groupedTasks: [TaskCategory: [AppTask]] {
         Dictionary(grouping: tasks, by: { $0.category })
     }
 
@@ -27,7 +28,7 @@ struct Tasks: View {
         groupedTasks.keys.sorted(by: { $0.rawValue < $1.rawValue })
     }
     
-    func sendTasksToWatch(_ tasks: [Task]) {
+    func sendTasksToWatch(_ tasks: [AppTask]) {
         let watchTasks: [WatchTask] = tasks.map { task in
             WatchTask(
                 name: task.name,

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TaskDetailView: View {
-    @State var task: WatchTask
+    @State var task: Task
     var connectivity = WatchConnection.shared
     @Environment(TasksAppManager.self) var taskManager
     

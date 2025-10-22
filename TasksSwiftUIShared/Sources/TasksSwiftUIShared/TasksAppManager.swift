@@ -9,12 +9,12 @@ import Foundation
 
 @Observable
 class TasksAppManager {
-    static let shared = TasksAppManager()
+    @MainActor static let shared = TasksAppManager()
     
-    var tasks: [Task] = []
-    var selectedTask: Task?
+    var tasks: [AppTask] = []
+    var selectedTask: AppTask?
     
-    func updatedTasks(tasks: [Task]) {
+    func updatedTasks(tasks: [AppTask]) {
         self.tasks = tasks
         self.selectedTask = tasks.first
     }

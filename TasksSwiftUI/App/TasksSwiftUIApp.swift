@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import TasksSwiftUIShared
 
 @main
 struct TasksSwiftUIApp: App {
@@ -14,7 +15,7 @@ struct TasksSwiftUIApp: App {
         WindowGroup {
             TabBar()
         }
-        .modelContainer(for: Task.self)
+        .modelContainer(for: AppTask.self)
     }
 }
 

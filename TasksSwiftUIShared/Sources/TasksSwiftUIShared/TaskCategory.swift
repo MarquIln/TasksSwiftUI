@@ -1,12 +1,12 @@
 //
 //  TaskCategory.swift
-//  TasksApp Watch App
+//  Tasks
 //
-//  Created by Marcos on 21/10/25.
+//  Created by Igor Vicente on 30/07/25.
 //
 import Foundation
 
-enum TaskCategory: String, CaseIterable, Identifiable, Codable {
+public enum TaskCategory: String, CaseIterable, Identifiable, Codable {
     case education = "Education"
     case fitness = "Fitness"
     case groceries = "Groceries"
@@ -17,9 +17,9 @@ enum TaskCategory: String, CaseIterable, Identifiable, Codable {
     case shopping = "Shopping"
     case travel = "Travel"
     
-    var id: String { rawValue }
+    public var id: String { rawValue }
     
-    var imageName: String {
+    public var imageName: String {
         switch self {
         case .education:
             return "graduationcap.fill"

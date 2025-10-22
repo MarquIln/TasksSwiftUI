@@ -8,8 +8,9 @@
 import Foundation
 import WatchConnectivity
 
+@available(iOS 17, *)
 class WatchConnection: NSObject, WCSessionDelegate {
-    static let shared = WatchConnection()
+    @MainActor static let shared = WatchConnection()
 
     override init() {
         super.init()
@@ -26,16 +27,25 @@ class WatchConnection: NSObject, WCSessionDelegate {
         error: (any Error)?
     ) {
     }
+    
+    func sessionDidBecomeInactive(_ session: WCSession) {
+    }
+
+    func sessionDidDeactivate(_ session: WCSession) {
+    }
 
     func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
-        let taskManager = TasksAppManager.shared
+        let tasksData: Data? = applicationContext["tasks"] as? Data
 
-        if let watchTasks = applicationContext["tasks"] as? Data {
-            if let decodedTasks = try? JSONDecoder().decode([Task].self, from: watchTasks) {
+        Task { @MainActor in
+            guard let tasksData else { return }
+
+            let taskManager = TasksAppManager.shared
+            if let decodedTasks = try? JSONDecoder().decode([AppTask].self, from: tasksData) {
                 taskManager.tasks = decodedTasks
                 taskManager.selectedTask = decodedTasks.first
             } else {
-                print("Ih, deu ruim.")
+                print("Failed to decode tasks from Watch applicationContext")
             }
         }
     }
@@ -52,8 +62,8 @@ class WatchConnection: NSObject, WCSessionDelegate {
         }
     }
 
-    func sendUpdatedTasks(tasks: [Task]) {
-        let tasks = tasks.map { Task(
+    func sendUpdatedTasks(tasks: [AppTask]) {
+        let tasks = tasks.map { AppTask(
             name: $0.name,
             details: $0.details,
             category: $0.category,
@@ -68,3 +78,4 @@ class WatchConnection: NSObject, WCSessionDelegate {
         }
     }
 }
+
