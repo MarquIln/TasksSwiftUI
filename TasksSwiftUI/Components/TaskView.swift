@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TaskView: View {
-    var task: Task
+    var task: AppTask
     
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 16) {

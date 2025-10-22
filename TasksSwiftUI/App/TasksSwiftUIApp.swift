@@ -14,7 +14,7 @@ struct TasksSwiftUIApp: App {
         WindowGroup {
             TabBar()
         }
-        .modelContainer(for: Task.self)
+        .modelContainer(for: AppTask.self)
     }
 }
 

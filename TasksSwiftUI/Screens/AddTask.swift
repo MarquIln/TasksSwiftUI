@@ -10,14 +10,27 @@ import SwiftUI
 struct AddTask: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) var modelContext
-    
-    var selectedTask: Task?
+
+    let selectedTask: AppTask?
 
     @State var name: String = ""
     @State var description: String = ""
     @State var selectedCategory: TaskCategory?
     @State var isCompleted: Bool = false
     @State var showAlert: Bool = false
+    private let connectivity = IOSConnection()
+
+    init(selectedTask: AppTask? = nil) {
+        self.selectedTask = selectedTask
+    }
+
+    private var isUnchanged: Bool {
+        guard let existing = selectedTask else { return false }
+        return selectedCategory == existing.category
+            && name == existing.name
+            && description == existing.details
+            && isCompleted == existing.isCompleted
+    }
 
     var isEditing: Bool {
         selectedTask != nil
@@ -56,7 +69,7 @@ struct AddTask: View {
                             Spacer()
 
                             Menu {
-                                ForEach(TaskCategory.allCases) { category in
+                                ForEach(TaskCategory.allCases, id: \.self) { category in
                                     Button(category.rawValue, systemImage: category.imageName) {
                                         selectedCategory = category
                                     }
@@ -118,6 +131,7 @@ struct AddTask: View {
                     Button {
                         if let selectedTask {
                             modelContext.delete(selectedTask)
+                            connectivity.updatedSelectedTask(selectedTask: selectedTask)
                             dismiss()
                         }
                     } label: {
@@ -151,16 +165,6 @@ struct AddTask: View {
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-
-                    // Split complex boolean logic into a tiny helper to help the type-checker
-                    let isUnchanged: Bool = {
-                        guard isEditing, let existing = selectedTask else { return false }
-                        return selectedCategory == existing.category
-                            && name == existing.name
-                            && description == existing.details
-                            && isCompleted == existing.isCompleted
-                    }()
-
                     Button(isEditing ? "Done" : "Add") {
                         if let selectedCategory, !name.isEmpty && !description.isEmpty {
 
@@ -171,7 +175,7 @@ struct AddTask: View {
                                 selectedTask.isCompleted = isCompleted
 
                             } else {
-                                let newTask = Task(
+                                let newTask = AppTask(
                                     name: name,
                                     details: description,
                                     category: selectedCategory,

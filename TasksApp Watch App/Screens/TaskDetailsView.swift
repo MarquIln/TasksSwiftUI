@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
+import WidgetKit
 
 struct TaskDetailView: View {
-    @State var task: WatchTask
+    @State var task: AppTask
     var connectivity = WatchConnection.shared
     @Environment(TasksAppManager.self) var taskManager
-    
+
     var body: some View {
         VStack(spacing: 8) {
             Image(systemName: task.category.imageName)
@@ -26,8 +27,22 @@ struct TaskDetailView: View {
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
+//            Button {
+//                task.isCompleted.toggle()
+//            } label: {
+//                Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
+//                    .foregroundStyle(task.isCompleted ? .blue : .gray)
+//                    .frame(width: 22, height: 22)
+//            }
         }
         .padding(.vertical)
         .navigationTitle("Task")
+        .onTapGesture {
+            withAnimation {
+                connectivity.updatedSelectedTask(selectedTask: taskManager.selectedTask)
+                SharedTask.update(task: taskManager.selectedTask)
+                WidgetCenter.shared.reloadAllTimelines()
+            }
+        }
     }
 }

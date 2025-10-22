@@ -6,7 +6,9 @@
 //
 
 import Foundation
+import SwiftUI
 import WatchConnectivity
+import WidgetKit
 
 class WatchConnection: NSObject, WCSessionDelegate {
     static let shared = WatchConnection()
@@ -31,11 +33,21 @@ class WatchConnection: NSObject, WCSessionDelegate {
         let taskManager = TasksAppManager.shared
 
         if let watchTasks = applicationContext["tasks"] as? Data {
-            if let decodedTasks = try? JSONDecoder().decode([WatchTask].self, from: watchTasks) {
+            if let decodedTasks = try? JSONDecoder().decode([AppTask].self, from: watchTasks) {
                 taskManager.tasks = decodedTasks
-                taskManager.selectedTask = decodedTasks.first
             } else {
                 print("Ih, deu ruim.")
+            }
+        } else if let updatedTasks = applicationContext["update"] as? Data {
+            if let decodedUpdatedTask = try? JSONDecoder().decode(AppTask.self, from: updatedTasks) {
+                taskManager.selectedTask = decodedUpdatedTask
+                if taskManager.selectedTask?.name == decodedUpdatedTask.name {
+                    withAnimation {
+                        taskManager.selectedTask?.isCompleted = decodedUpdatedTask.isCompleted
+                    }
+                }
+            } else {
+                print("Deu certo nao.")
             }
         }
     }
@@ -52,19 +64,21 @@ class WatchConnection: NSObject, WCSessionDelegate {
         }
     }
 
-    func sendUpdatedTasks(tasks: [WatchTask]) {
-        let tasks = tasks.map { Task(
-            name: $0.name,
-            details: $0.details,
-            category: $0.category,
-            isCompleted: $0.isCompleted
-        )}
-        
+    func sendUpdatedTasks(tasks: [AppTask]) {
         if let taskData = try? JSONEncoder().encode(tasks) {
             let tasksPayload: [String: Any] = ["tasks": taskData]
             setContext(to: tasksPayload)
         } else {
             print("Failed to encode WatchTask array")
+        }
+    }
+
+    func updatedSelectedTask(selectedTask: AppTask?) {
+        if let selectedTask {
+            if let payload = try? JSONEncoder().encode(selectedTask) {
+                let updatedPayload: [String: Any] = ["update": payload]
+                setContext(to: updatedPayload)
+            }
         }
     }
 }

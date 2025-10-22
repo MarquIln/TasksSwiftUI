@@ -12,32 +12,22 @@ struct Tasks: View {
 
     @Environment(\.modelContext) var modelContext
 
-    @State var editTask: Task?
+    @State var editTask: AppTask?
     @State private var addTask: Bool = false
 
-    @Query var tasks: [Task]
+    @Query var tasks: [AppTask]
 
-    let connectivity = iOSConnectivity()
+    private let connectivity = IOSConnection.shared
 
-    var groupedTasks: [TaskCategory: [Task]] {
+    var groupedTasks: [TaskCategory: [AppTask]] {
         Dictionary(grouping: tasks, by: { $0.category })
     }
 
     var sortedCategories: [TaskCategory] {
         groupedTasks.keys.sorted(by: { $0.rawValue < $1.rawValue })
     }
-    
-    func sendTasksToWatch(_ tasks: [Task]) {
-        let watchTasks: [WatchTask] = tasks.map { task in
-            WatchTask(
-                name: task.name,
-                details: task.details,
-                category: task.category,
-                isCompleted: task.isCompleted
-            )
-        }
-        connectivity.sendUpdatedTasks(tasks: watchTasks)
-    }
+
+    @State private var id = UUID()
 
     var body: some View {
         VStack {
@@ -67,7 +57,7 @@ struct Tasks: View {
                                 }
                             }
                             .onChange(of: task.isCompleted) { _, _ in
-                                sendTasksToWatch(tasks)
+                                connectivity.sendUpdatedTasks(tasks: tasks)
                             }
                         }
                     }
@@ -76,11 +66,11 @@ struct Tasks: View {
             }
         }
         .navigationTitle("Tasks")
+        .navigationBarTitleDisplayMode(.large)
         .background(.backgroundPrimary)
         .toolbarBackground(.backgroundSecondary, for: .tabBar)
         .toolbarBackgroundVisibility(.visible, for: .tabBar)
         .toolbarBackground(.backgroundPrimary, for: .navigationBar)
-        .toolbarBackgroundVisibility(.visible, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -98,10 +88,10 @@ struct Tasks: View {
             AddTask(selectedTask: task)
         }
         .onChange(of: tasks) { _, newTasks in
-            sendTasksToWatch(newTasks)
+            connectivity.sendUpdatedTasks(tasks: tasks)
         }
         .task {
-            sendTasksToWatch(tasks)
+            connectivity.sendUpdatedTasks(tasks: tasks)
         }
     }
 }

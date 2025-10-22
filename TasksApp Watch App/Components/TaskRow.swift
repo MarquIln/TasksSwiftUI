@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TaskRow: View {
-    let task: WatchTask
+    let task: AppTask
     
     var body: some View {
         HStack(spacing: 8) {

@@ -11,17 +11,11 @@ import Foundation
 class TasksAppManager {
     static let shared = TasksAppManager()
     
-    var tasks: [WatchTask] = []
-    var selectedTask: WatchTask?
-    
-    func updatedTasks(tasks: [WatchTask]) {
+    var tasks: [AppTask] = []
+    var selectedTask: AppTask?
+
+    func updatedTasks(tasks: [AppTask]) {
         self.tasks = tasks
         self.selectedTask = tasks.first
-    }
-    
-    func toggleTask() {
-        if let index = tasks.firstIndex(where: { $0.name == selectedTask?.name}) {
-            tasks[index].isCompleted.toggle()
-        }
     }
 }
