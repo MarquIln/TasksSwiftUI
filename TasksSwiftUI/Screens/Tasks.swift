@@ -53,6 +53,7 @@ struct Tasks: View {
                             .swipeActions(edge: .trailing) {
                                 Button("Delete", systemImage: "trash", role: .destructive) {
                                     modelContext.delete(task)
+                                    connectivity.sendUpdatedTasks(tasks: tasks)
                                     try? modelContext.save()
                                 }
                             }

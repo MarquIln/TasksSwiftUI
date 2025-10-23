@@ -58,7 +58,7 @@ struct TasksApp_Watch_App_Complication: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             TasksApp_Watch_App_ComplicationEntryView(entry: entry)
-                .containerBackground(.fill.quaternary, for: .widget)
+                .containerBackground(.fill.secondary, for: .widget)
         }
         .configurationDisplayName("My Tasks")
         .description("Launch my Tasks from the watch")

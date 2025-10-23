@@ -13,7 +13,6 @@ import WidgetKit
 
 class IOSConnection: NSObject, WCSessionDelegate {
     static let shared = IOSConnection()
-    var id = UUID()
 
     override init() {
         super.init()
@@ -44,28 +43,19 @@ class IOSConnection: NSObject, WCSessionDelegate {
     func sessionDidDeactivate(_ session: WCSession) {
     }
 
-    func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
-        Task { @MainActor in
-            if let updatedTask = applicationContext["update"] as? Data {
-                if let decodedTask = try? JSONDecoder().decode(AppTask.self, from: updatedTask) {
-                    let container = try! ModelContainer(for: AppTask.self)
-                    let predicate = #Predicate<AppTask> { $0.name == decodedTask.name }
-                    let descriptor = FetchDescriptor<AppTask>(predicate: predicate)
-                    let foundTasks = try? container.mainContext.fetch(descriptor)
-                    if let task = foundTasks?.first {
-                        task.name = decodedTask.name
-                        task.details = decodedTask.details
-                        task.category = decodedTask.category
-                        task.isCompleted = decodedTask.isCompleted
-                        try? container.mainContext.save()
-                        WidgetCenter.shared.reloadAllTimelines()
-                        id = UUID()
-                    }
-                }
+    func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
+        let taskManager = TasksAppManager.shared
+
+        if let watchTasks = applicationContext["tasks"] as? Data {
+            if let decodedTasks = try? JSONDecoder().decode([AppTask].self, from: watchTasks) {
+                taskManager.tasks = decodedTasks
+                taskManager.selectedTask = decodedTasks.first
+            } else {
+                print("Ih, deu ruim.")
             }
         }
     }
-
+    
     func setContext(to payload: [String: Any]) {
         let session = WCSession.default
 
